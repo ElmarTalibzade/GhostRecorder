@@ -5,181 +5,19 @@ using UnityEngine;
 
 public class GhostRecorder : MonoBehaviour
 {
-    public GameObject recordTarget;                 // GameObject whose position will be recorded
-    public GameObject replayGhostTarget;                  // GameObject which will act as a Ghost of a record target during replay
+    private GhostShot[] frames;
 
-    private GhostShot[] shots;                       // Stores the snapshots of the latest recording
+    private bool isRecording;
 
-    public float maxRecordTime = 10;                // Maximum recording time in seconds
-    public float snapshotFrequency = 0.1f;          // How often should position and rotation be recorded?
+    private int recordIndex = 0;
+    private float recordTime = 0.0f;
 
-    public bool isRecording;
-    public bool isReplaying;
-
+    #region Event Handlers
     public event EventHandler RecordingStarted;
     public event EventHandler RecordingEnded;
+    #endregion
 
-    public event EventHandler ReplayStarted;
-    public event EventHandler ReplayEnded;
-
-    private int recordingIndex = 0;
-    private int replayIndex = 0;
-
-    public float replayTimescale = 1;              // change this value below 1 to make replays slower and above 1 to make them faster
-
-    private float recordingTime = 0.0f;            // the total number of seconds for recording
-    private float playbackTime = 0.0f;         // current time at which the replay is at, used for replaying the recording
-
-    public void StartRecording()
-    {
-        if (!IsRecording() && !IsReplaying())
-        {
-            int arrSize = (int)(maxRecordTime / snapshotFrequency);
-            shots = new GhostShot[arrSize];           //create an array of potential recordings
-            recordingIndex = 0;
-            recordingTime = Time.time;
-
-            isRecording = true;
-            OnRecordingStart();
-            Debug.Log("Recording began with and can hold up to " + arrSize + " frames");
-
-            InvokeRepeating("RecordSnapshot", 0, snapshotFrequency);                    // start recording snapshots at a specified frequency
-        }
-    }
-
-    void RecordSnapshot()
-    {
-        if (IsRecording())
-        {
-            if (recordingIndex < shots.Length)
-            {
-                recordingTime += Time.deltaTime;                                // increase the elapsed time
-                GhostShot newShot = new GhostShot(false);                       // create a new GhostShot
-
-
-                newShot.timeMark = recordingTime;                              // mark the beginning time
-                newShot.posMark= recordTarget.transform.position;
-                newShot.rotMark = recordTarget.transform.rotation;
-
-                shots[recordingIndex] = newShot;                                // allocate the new shot to a specified array item
-
-                recordingIndex++;                                               // increase the index
-            }
-            else
-            {
-                StopRecording();
-            }
-        }
-    }
-
-    public void StopRecording()
-    {
-        if (IsRecording())
-        {
-            CancelInvoke();
-
-            if (recordingIndex < shots.Length)              // if the recording has ended prematurely
-            {
-                Debug.Log("Recording ended prematurely at frame " + recordingIndex);
-                shots[recordingIndex - 1].isFinal = true;
-            }
-            else
-            {
-                shots[shots.Length - 1].isFinal = true;     // otherwise, mark the last shot as Final
-            }
-
-            isRecording = false;
-
-            OnRecordingEnd();
-        }
-    }
-
-    public void StartReplay()
-    {
-        if (!IsReplaying())
-        {
-            replayIndex = 0;
-
-            replayGhostTarget.transform.position = shots[0].posMark;
-            replayGhostTarget.transform.rotation = shots[0].rotMark;
-
-            replayGhostTarget.SetActive(true);
-
-            isReplaying = true;
-
-            OnReplayStart();
-        }
-    }
-
-    private void Update()
-    {
-        if (IsReplaying())
-        {
-            if (replayIndex < shots.Length)                                             // if the current index is within the boundaries of the array...
-            {
-                GhostShot shot = shots[replayIndex];
-
-                if (!shot.isFinal)                                        // the current shot is not final...
-                {
-                    if (playbackTime < shot.timeMark)
-                    {
-                        if (replayIndex == 0)       // if this is a the first shot mark...
-                        {
-                            playbackTime = shot.timeMark;
-                        }
-                        else
-                        {
-                            LerpGhost(replayGhostTarget, shots[replayIndex - 1], shot);
-                            playbackTime += Time.deltaTime * replayTimescale;
-                        }
-                    }
-                    else
-                    {
-                        replayIndex++;
-                    }
-                }
-                else
-                {
-                    StopReplay();
-                }
-            }
-            else
-            {
-                StopReplay();
-            }
-        }
-    }
-
-    private void LerpGhost(GameObject ghost, GhostShot a, GhostShot b)
-    {
-        ghost.transform.position = Vector3.Slerp(a.posMark, b.posMark, Mathf.Clamp(playbackTime, a.timeMark, b.timeMark));
-        ghost.transform.rotation = Quaternion.Slerp(a.rotMark, b.rotMark, Mathf.Clamp(playbackTime, a.timeMark, b.timeMark));
-    }
-
-    public void StopReplay()
-    {
-        if (IsReplaying())
-        {
-            replayIndex = 0;
-            playbackTime = 0.0f;
-
-            replayGhostTarget.SetActive(false);
-            isReplaying = false;
-
-            OnReplayEnd();
-        }
-    }
-
-    public bool IsRecording()
-    {
-        return isRecording;
-    }
-
-    public bool IsReplaying()
-    {
-        return isReplaying;
-    }
-
+    #region Event Invokers
     protected virtual void OnRecordingStart()
     {
         if (RecordingStarted != null)
@@ -195,20 +33,67 @@ public class GhostRecorder : MonoBehaviour
             RecordingEnded.Invoke(this, EventArgs.Empty);
         }
     }
+    #endregion
 
-    protected virtual void OnReplayStart()
+    void StartRecording()
     {
-        if (ReplayStarted != null)
+        if (!IsRecording())
         {
-            ReplayStarted.Invoke(this, EventArgs.Empty);
+            frames = new GhostShot[600];                // 60 * 10 = 600 (10 seconds)
+            recordIndex = 0;
+            recordTime = Time.time;
+
+            isRecording = true;
+            OnRecordingStart();
+
+            Debug.LogFormat("Recording of {0} started", gameObject.name);
         }
     }
 
-    protected virtual void OnReplayEnd()
+    void StopRecording()
     {
-        if (ReplayEnded != null)
+        if (IsRecording())
         {
-            ReplayEnded.Invoke(this, EventArgs.Empty);
+            frames[recordIndex].isFinal = true;
+
+            isRecording = false;
+            OnRecordingEnd();
+
+            Debug.LogFormat("Recording of {0} ended at frame {1}", gameObject.name, recordIndex);
         }
+    }
+
+    void Update()
+    {
+        if (IsRecording())
+        {
+            RecordFrame();
+        }
+    }
+
+    private void RecordFrame()
+    {
+        if (recordIndex < frames.Length)
+        {
+            recordTime += Time.deltaTime;
+            GhostShot newFrame = new GhostShot();
+
+            newFrame.timeMark = recordTime;
+            newFrame.posMark = transform.position;
+            newFrame.rotMark = transform.rotation;
+
+            frames[recordIndex] = newFrame;
+
+            recordIndex++;
+        }
+        else
+        {
+            StopRecording();
+        }
+    }
+
+    public bool IsRecording()
+    {
+        return isRecording;
     }
 }

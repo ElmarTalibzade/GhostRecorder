@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class GhostRecorder_UIManager : MonoBehaviour
 {
-    public GhostRecorder recorder;
+    public GhostSystem recorder;
 
     public GameObject ButtonStartRecord;
     public GameObject ButtonEndRecord;

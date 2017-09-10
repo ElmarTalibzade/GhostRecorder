@@ -12,8 +12,8 @@ public class GhostShot
     public Vector3 posMark;
     public Quaternion rotMark;
 
-    public GhostShot(bool _isFinal)
+    public GhostShot()
     {
-        isFinal = _isFinal;
+        isFinal = false;
     }
 }
