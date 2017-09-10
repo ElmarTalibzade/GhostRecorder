@@ -35,7 +35,7 @@ public class GhostRecorder : MonoBehaviour
     }
     #endregion
 
-    void StartRecording()
+    public void StartRecording()
     {
         if (!IsRecording())
         {
@@ -50,7 +50,7 @@ public class GhostRecorder : MonoBehaviour
         }
     }
 
-    void StopRecording()
+    public void StopRecording()
     {
         if (IsRecording())
         {
@@ -95,5 +95,10 @@ public class GhostRecorder : MonoBehaviour
     public bool IsRecording()
     {
         return isRecording;
+    }
+
+    public GhostShot[] GetFrames()
+    {
+        return frames;
     }
 }
