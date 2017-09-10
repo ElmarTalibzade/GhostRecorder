@@ -7,7 +7,7 @@ You can see GhostRecorder in action here: https://youtu.be/AD2W5EXex5Q
 
 ## WebGL Demo
 
-You can also play around with in in a WebGL Demo: [COMING SOON]
+You can also play around with it in a WebGL Demo: https://elmartalibzade.itch.io/ghostrecorder
 
 ## Instructions
 Simply drag and drop a GameObject that you wish to record inside of "Recorder" GameObject and a Ghost GameObject (which will miminc the original GameObject during the replay).scs
