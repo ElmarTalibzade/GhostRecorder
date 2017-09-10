@@ -1640,7 +1640,7 @@ MonoBehaviour:
   recordTarget: {fileID: 280525682}
   replayGhostTarget: {fileID: 1635218226}
   maxRecordTime: 10
-  snapshotFrequency: 0.1
+  snapshotFrequency: 0.01
   isRecording: 0
   isReplaying: 0
   replayTimescale: 1
@@ -1651,7 +1651,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1870638995}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 719.029, y: 250.07071, z: 1.109375}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

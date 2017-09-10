@@ -28,18 +28,20 @@ public class GhostRecorder : MonoBehaviour
     public float replayTimescale = 1;              // change this value below 1 to make replays slower and above 1 to make them faster
 
     private float recordingTime = 0.0f;            // the total number of seconds for recording
-    private float currentReplayTime = 0.0f;         // current time at which the replay is at, used for replaying the recording
+    private float playbackTime = 0.0f;         // current time at which the replay is at, used for replaying the recording
 
     public void StartRecording()
     {
         if (!IsRecording() && !IsReplaying())
         {
-            shots = new GhostShot[(int)(maxRecordTime / snapshotFrequency)];           //create an array of potential recordings
+            int arrSize = (int)(maxRecordTime / snapshotFrequency);
+            shots = new GhostShot[arrSize];           //create an array of potential recordings
             recordingIndex = 0;
             recordingTime = Time.time;
 
             isRecording = true;
             OnRecordingStart();
+            Debug.Log("Recording began with and can hold up to " + arrSize + " frames");
 
             InvokeRepeating("RecordSnapshot", 0, snapshotFrequency);                    // start recording snapshots at a specified frequency
         }
@@ -54,22 +56,10 @@ public class GhostRecorder : MonoBehaviour
                 recordingTime += Time.deltaTime;                                // increase the elapsed time
                 GhostShot newShot = new GhostShot(false);                       // create a new GhostShot
 
-                newShot.timeBegin = recordingTime;                              // mark the beginning time
-                newShot.timeEnd = newShot.timeBegin + snapshotFrequency;        // mark the end time by adding snapshotFrequency
 
-                if (recordingIndex > 0)                                         // if this isn't the first shot...
-                {
-                    newShot.posBegin = shots[recordingIndex - 1].posEnd;        // ...then mark the previous position as a beginning position for this shot
-                    newShot.rotBegin = shots[recordingIndex - 1].rotEnd;
-                }
-                else
-                {
-                    newShot.posBegin = recordTarget.transform.position;         // ...otherwise mark the current position as the beginning position for this shot
-                    newShot.rotBegin = recordTarget.transform.rotation;
-                }
-
-                newShot.posEnd = recordTarget.transform.position;
-                newShot.rotEnd = recordTarget.transform.rotation;
+                newShot.timeMark = recordingTime;                              // mark the beginning time
+                newShot.posMark= recordTarget.transform.position;
+                newShot.rotMark = recordTarget.transform.rotation;
 
                 shots[recordingIndex] = newShot;                                // allocate the new shot to a specified array item
 
@@ -90,7 +80,7 @@ public class GhostRecorder : MonoBehaviour
 
             if (recordingIndex < shots.Length)              // if the recording has ended prematurely
             {
-                Debug.Log("Recording ended prematurely at " + recordingIndex);
+                Debug.Log("Recording ended prematurely at frame " + recordingIndex);
                 shots[recordingIndex - 1].isFinal = true;
             }
             else
@@ -110,8 +100,8 @@ public class GhostRecorder : MonoBehaviour
         {
             replayIndex = 0;
 
-            replayGhostTarget.transform.position = shots[0].posBegin;
-            replayGhostTarget.transform.rotation = shots[0].rotBegin;
+            replayGhostTarget.transform.position = shots[0].posMark;
+            replayGhostTarget.transform.rotation = shots[0].rotMark;
 
             replayGhostTarget.SetActive(true);
 
@@ -127,29 +117,25 @@ public class GhostRecorder : MonoBehaviour
         {
             if (replayIndex < shots.Length)                                             // if the current index is within the boundaries of the array...
             {
-                if (!shots[replayIndex].isFinal)                                        // the current shot is not final...
+                GhostShot shot = shots[replayIndex];
+
+                if (!shot.isFinal)                                        // the current shot is not final...
                 {
-                    if (currentReplayTime < shots[replayIndex].timeBegin)               // if the current replay time is before the current shot begin mark...
+                    if (playbackTime < shot.timeMark)
                     {
-                        if (replayIndex != 0)
+                        if (replayIndex == 0)       // if this is a the first shot mark...
                         {
-                            replayIndex--;                                              // ...go index lower and skip the current iteration
+                            playbackTime = shot.timeMark;
                         }
                         else
                         {
-                            currentReplayTime = shots[replayIndex].timeBegin;
+                            LerpGhost(replayGhostTarget, shots[replayIndex - 1], shot);
+                            playbackTime += Time.deltaTime * replayTimescale;
                         }
                     }
-                    else if (currentReplayTime > shots[replayIndex].timeEnd)            // if the current replay time is higher than the current shot end mark...
+                    else
                     {
-                        replayIndex++;                                                  // ...go index higher and skip the current iteration
-                    }
-                    else                                                                // if the current replay time is within the current shot time-frame...
-                    {
-                        replayGhostTarget.transform.position = shots[replayIndex].PosLerp(currentReplayTime);          // lerps the position and applies it onto the ghost
-                        replayGhostTarget.transform.rotation = shots[replayIndex].RotLerp(currentReplayTime);
-
-                        currentReplayTime += Time.deltaTime * replayTimescale;
+                        replayIndex++;
                     }
                 }
                 else
@@ -164,12 +150,18 @@ public class GhostRecorder : MonoBehaviour
         }
     }
 
+    private void LerpGhost(GameObject ghost, GhostShot a, GhostShot b)
+    {
+        ghost.transform.position = Vector3.Slerp(a.posMark, b.posMark, Mathf.Clamp(playbackTime, a.timeMark, b.timeMark));
+        ghost.transform.rotation = Quaternion.Slerp(a.rotMark, b.rotMark, Mathf.Clamp(playbackTime, a.timeMark, b.timeMark));
+    }
+
     public void StopReplay()
     {
         if (IsReplaying())
         {
             replayIndex = 0;
-            currentReplayTime = 0.0f;
+            playbackTime = 0.0f;
 
             replayGhostTarget.SetActive(false);
             isReplaying = false;
