@@ -35,11 +35,11 @@ public class GhostRecorder : MonoBehaviour
     }
     #endregion
 
-    public void StartRecording()
+    public void StartRecording(float duration)
     {
         if (!IsRecording())
         {
-            frames = new GhostShot[600];                // 60 * 10 = 600 (10 seconds)
+            frames = new GhostShot[(int)(60 * duration)];
             recordIndex = 0;
             recordTime = Time.time * 1000;
 

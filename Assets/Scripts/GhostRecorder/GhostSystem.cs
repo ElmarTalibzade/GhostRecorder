@@ -8,10 +8,18 @@ public class GhostSystem : MonoBehaviour
     private GhostRecorder[] recorders;
     private GhostActor[] ghostActors;
 
+    private CameraFollow cameraFollow;
+
+    public Transform playerControlled;
+    public Transform playerGhost;
+
+    public float recordDuration = 10;
+
     private void Start()
     {
         recorders = FindObjectsOfType<GhostRecorder>();
         ghostActors = FindObjectsOfType<GhostActor>();
+        cameraFollow = FindObjectOfType<CameraFollow>();
     }
 
     private bool isRecording;
@@ -21,7 +29,7 @@ public class GhostSystem : MonoBehaviour
     {
         for (int i = 0; i < recorders.Length; i++)
         {
-            recorders[i].StartRecording();
+            recorders[i].StartRecording(recordDuration);
         }
 
         OnRecordingStart();
@@ -44,6 +52,13 @@ public class GhostSystem : MonoBehaviour
             ghostActors[i].StartReplay();
         }
 
+        for (int i = 0; i < recorders.Length; i++)
+        {
+            recorders[i].GetComponent<Renderer>().enabled = false;
+        }
+
+        cameraFollow.followTarget = playerGhost;
+
         OnReplayStart();
     }
 
@@ -53,6 +68,13 @@ public class GhostSystem : MonoBehaviour
         {
             ghostActors[i].StopReplay();
         }
+
+        for (int i = 0; i < recorders.Length; i++)
+        {
+            recorders[i].GetComponent<Renderer>().enabled = true;
+        }
+
+        cameraFollow.followTarget = playerControlled;
 
         OnReplayEnd();
     }
