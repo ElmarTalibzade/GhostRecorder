@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GhostRecorder_UIManager : MonoBehaviour
+public class GhostSystem_UIManager : MonoBehaviour
 {
     public GhostSystem recorder;
 

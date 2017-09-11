@@ -10,7 +10,7 @@ public class GhostRecorder : MonoBehaviour
     private bool isRecording;
 
     private int recordIndex = 0;
-    private float recordTime = 0.0f;
+    private float recordTime = 0.0f;            // in milliseconds
 
     #region Event Handlers
     public event EventHandler RecordingStarted;
@@ -41,7 +41,7 @@ public class GhostRecorder : MonoBehaviour
         {
             frames = new GhostShot[600];                // 60 * 10 = 600 (10 seconds)
             recordIndex = 0;
-            recordTime = Time.time;
+            recordTime = Time.time * 1000;
 
             isRecording = true;
             OnRecordingStart();
@@ -54,7 +54,7 @@ public class GhostRecorder : MonoBehaviour
     {
         if (IsRecording())
         {
-            frames[recordIndex].isFinal = true;
+            frames[recordIndex - 1].isFinal = true;
 
             isRecording = false;
             OnRecordingEnd();
@@ -75,12 +75,13 @@ public class GhostRecorder : MonoBehaviour
     {
         if (recordIndex < frames.Length)
         {
-            recordTime += Time.deltaTime;
-            GhostShot newFrame = new GhostShot();
-
-            newFrame.timeMark = recordTime;
-            newFrame.posMark = transform.position;
-            newFrame.rotMark = transform.rotation;
+            recordTime += Time.smoothDeltaTime * 1000;
+            GhostShot newFrame = new GhostShot()
+            {
+                timeMark = recordTime,
+                posMark = transform.position,
+                rotMark = transform.rotation
+            };
 
             frames[recordIndex] = newFrame;
 

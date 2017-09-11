@@ -14,7 +14,7 @@ public class GhostActor : MonoBehaviour
     private bool isReplaying;
 
     private int replayIndex = 0;
-    private float replayTime = 0.0f;
+    private float replayTime = 0.0f;            // in milliseconds
 
     private Renderer render;
 
@@ -46,7 +46,6 @@ public class GhostActor : MonoBehaviour
     private void Awake()
     {
         render = GetComponent<Renderer>();
-
     }
 
     public void StartReplay()
@@ -62,6 +61,8 @@ public class GhostActor : MonoBehaviour
             transform.rotation = frames[0].rotMark;
 
             render.enabled = true;
+
+            isReplaying = true;
 
             OnReplayStart();
         }
@@ -100,7 +101,7 @@ public class GhostActor : MonoBehaviour
                         else
                         {
                             DoLerp(frames[replayIndex - 1], frame);
-                            replayTime += Time.deltaTime * replayTimescale;
+                            replayTime += Time.smoothDeltaTime * 1000 * replayTimescale;
                         }
                     }
                     else

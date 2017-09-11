@@ -117,9 +117,9 @@ GameObject:
   m_Component:
   - component: {fileID: 280525686}
   - component: {fileID: 280525685}
+  - component: {fileID: 280525687}
   - component: {fileID: 280525684}
   - component: {fileID: 280525683}
-  - component: {fileID: 280525687}
   - component: {fileID: 280525688}
   - component: {fileID: 280525692}
   - component: {fileID: 280525689}
@@ -466,7 +466,6 @@ GameObject:
   m_Component:
   - component: {fileID: 522329813}
   - component: {fileID: 522329812}
-  - component: {fileID: 522329811}
   - component: {fileID: 522329810}
   - component: {fileID: 522329814}
   m_Layer: 0
@@ -482,7 +481,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 522329809}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_MotionVectors: 1
@@ -508,18 +507,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &522329811
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 522329809}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &522329812
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -534,11 +521,11 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 522329809}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4, y: 0.5, z: 3}
+  m_LocalPosition: {x: 4, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &522329814
 MonoBehaviour:
@@ -562,6 +549,7 @@ GameObject:
   m_Component:
   - component: {fileID: 570032448}
   - component: {fileID: 570032447}
+  - component: {fileID: 570032450}
   - component: {fileID: 570032446}
   - component: {fileID: 570032445}
   - component: {fileID: 570032449}
@@ -634,7 +622,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &570032449
 MonoBehaviour:
@@ -647,6 +635,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 666d6efc38ccb824694457c88b6e9420, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &570032450
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 570032444}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &794687672
 GameObject:
   m_ObjectHideFlags: 0
@@ -966,7 +969,7 @@ RectTransform:
   - {fileID: 1027736965}
   - {fileID: 1587172914}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1502,7 +1505,7 @@ GameObject:
   - component: {fileID: 1587172916}
   - component: {fileID: 1587172915}
   m_Layer: 5
-  m_Name: icon_play
+  m_Name: icon_replay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1583,7 +1586,7 @@ MeshRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1635218226}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 0
   m_MotionVectors: 1
@@ -1824,7 +1827,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1870638995
 GameObject:
@@ -1853,13 +1856,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8170a16c91aa1094db247e3f148c5f14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordTarget: {fileID: 280525682}
-  replayGhostTarget: {fileID: 1635218226}
-  maxRecordTime: 10
-  snapshotFrequency: 0.01
-  isRecording: 0
-  isReplaying: 0
-  replayTimescale: 1
 --- !u!4 &1870638997
 Transform:
   m_ObjectHideFlags: 0
