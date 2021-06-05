@@ -123,8 +123,9 @@ public class GhostActor : MonoBehaviour
 
     private void DoLerp(GhostShot a, GhostShot b)
     {
-        transform.position = Vector3.Slerp(a.posMark, b.posMark, Mathf.Clamp(replayTime, a.timeMark, b.timeMark));
-        transform.rotation = Quaternion.Slerp(a.rotMark, b.rotMark, Mathf.Clamp(replayTime, a.timeMark, b.timeMark));
+        float interpolationRatio = (replayTime - a.timeMark) / (b.timeMark - a.timeMark);
+        transform.position = Vector3.Lerp(a.posMark, b.posMark, interpolationRatio);
+        transform.rotation = Quaternion.Lerp(a.rotMark, b.rotMark, interpolationRatio);
     }
 
     public bool IsReplaying()
